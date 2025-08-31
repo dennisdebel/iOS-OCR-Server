@@ -8,6 +8,7 @@
 import Foundation
 import Vision
 
+
 class TextRecognizer {
     let recognitionLevel : RecognizeTextRequest.RecognitionLevel
     let usesLanguageCorrection : Bool

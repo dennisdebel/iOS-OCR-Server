@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Translation
 
 struct ContentView: View {
     @ObservedObject var serverManager: VaporServerManager
@@ -84,6 +85,16 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
+        .overlay(
+                    // Invisible bridge that initializes TranslationSession once:
+                    TranslationBridge(
+                        source: nil, // let system infer per fragment
+                        target: .init(identifier: "zh-Hant")
+                    ) { session in
+                        serverManager.setTranslationSession(session)
+                    }
+                    .frame(width: 0, height: 0)
+        )
         .overlay(
             Button(action: openDonation) {
                 Image(systemName: "cup.and.saucer")

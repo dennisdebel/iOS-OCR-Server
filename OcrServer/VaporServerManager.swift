@@ -8,6 +8,8 @@
 import SwiftUI
 import Combine
 import Vision
+import Translation
+
 
 @MainActor
 final class VaporServerManager: ObservableObject {
@@ -36,6 +38,10 @@ final class VaporServerManager: ObservableObject {
             .store(in: &cancellables)
         startServer()
     }
+    
+    func setTranslationSession(_ session: TranslationSession) {
+            Task { await server.setTranslationSession(session) }
+        }
     
     func startServer() {
         Task {

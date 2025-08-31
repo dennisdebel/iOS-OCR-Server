@@ -7,6 +7,7 @@
 
 import Vapor
 import Vision
+import Translation
 
 struct OCRBoxItem: Content {
     let text: String
@@ -30,9 +31,13 @@ struct UploadResponse: Content {
     let image_width: Int
     let image_height: Int
     let ocr_boxes: [OCRBoxItem]
+    let ocr_translated_zhHant: [String]?
+    let target_lang: String?
 }
 
+
 actor VaporServer {
+    private var translationSession: TranslationSession?
     private var app: Application?
     private var runTask: Task<Void, Never>?
     
@@ -102,6 +107,10 @@ actor VaporServer {
                 )
             }
         }
+    }
+    
+    func setTranslationSession(_ session: TranslationSession?) {
+        self.translationSession = session
     }
 
     func stop() async {
@@ -222,7 +231,9 @@ actor VaporServer {
                         ocr_result: "",
                         image_width: 0,
                         image_height: 0,
-                        ocr_boxes: []
+                        ocr_boxes: [],
+                        ocr_translated_zhHant: nil,
+                        target_lang: nil
                     )
                 )
             }
@@ -236,7 +247,9 @@ actor VaporServer {
                         ocr_result: "",
                         image_width: 0,
                         image_height: 0,
-                        ocr_boxes: []
+                        ocr_boxes: [],
+                        ocr_translated_zhHant: nil,
+                        target_lang: nil
                     )
                 )
             }
@@ -262,8 +275,24 @@ actor VaporServer {
                                                                                   ocr_result: "",
                                                                                   image_width: 0,
                                                                                   image_height: 0,
-                                                                                  ocr_boxes: []))
+                                                                                  ocr_boxes: [],
+                                                                                  ocr_translated_zhHant: nil,
+                                                                                  target_lang: nil))
             }
+     
+            // --- NEW: attempt translation if a session exists ---
+            var translated: [String]? = nil
+            if let session = await self.translationSession {
+                do {
+                    let manager = TranslationManager()          // ← declare it here
+                    manager.attach(session: session)            // or manager.attach(session) if your signature is unlabeled
+                    let lines = result.boxes.map(\.text)        // or: result.boxes.map { $0.text } for older Swift
+                    translated = try await manager.translateBatch(lines)
+                } catch {
+                    translated = nil // keep going even if translation fails
+                }
+            }
+
             
             let accept = (req.headers.first(name: .accept) ?? "").lowercased()
             if accept.contains("application/json") {
@@ -275,9 +304,12 @@ actor VaporServer {
                         ocr_result: result.text,
                         image_width: result.image_width,
                         image_height: result.image_height,
-                        ocr_boxes: result.boxes
+                        ocr_boxes: result.boxes,
+                        ocr_translated_zhHant: translated,
+                        target_lang: translated == nil ? nil : "zh-Hant"
                     )
                 )
+                
             } else {
                 let escaped = Self.htmlEscape(result.text)
                 let html = """
