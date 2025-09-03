@@ -266,6 +266,7 @@ The scripts `ocr-server-example.py` translates in input file to OCR'ed pdf. To u
 
   ![output1](output.jpg)
 
+  [pdf output example](output.pdf)
 
 ## Features
 
