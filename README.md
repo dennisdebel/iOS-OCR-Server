@@ -108,14 +108,14 @@ Includes translation (currently hardcoded Traditional Mandarin Chinese to Englis
   }
 ```
 
-  `ocr_result` shows raw ocr results
-  `ocr_boxes` contains:
-    `x` and `y` represent the top-left origin of the text bounding box (in px),
-    `w` and `h` represent the width and height of the text bounding box (in px).
-    `text` original text
-    `translated_text` translated text
-  `image_width` and `image_height` represent the width and height of the image (in px),
-  `ocr_translated_zhHant` full text translation
+`ocr_result` shows raw ocr results
+`ocr_boxes` contains:
+`x` and `y` represent the top-left origin of the text bounding box (in px),
+`w` and `h` represent the width and height of the text bounding box (in px).
+`text` original text
+`translated_text` translated text
+`image_width` and `image_height` represent the width and height of the image (in px),
+`ocr_translated_zhHant` full text translation
 
 
 - **Python Example – Drawing text bounding boxes using `ocr_boxes` information:**
