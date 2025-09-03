@@ -256,8 +256,7 @@ Includes translation (currently hardcoded Traditional Mandarin Chinese to Englis
 
 
 - **Advanced Python Example – Drawing text bounding boxes using `ocr_boxes` information and output ocr'ed pdf:**
-Install `pip3 install requests pillow opencv-python pymupdf`
-Run `python3 ocr-server-example.py`
+The scripts `ocr-server-example.py` translates in input file to OCR'ed pdf. To use it, first install the following dependencies: `pip3 install requests pillow opencv-python pymupdf` and then run: `python3 ocr-server-example.py`
 
   Sample input:
 
@@ -276,9 +275,12 @@ Run `python3 ocr-server-example.py`
 - JSON API for easy integration into apps
 - 100% local processing, no cloud, full privacy
 
+## Todo
+
+- Add selectable (dynamic) languages for translation
 
 ## Use Cases
 
-- Local OCR without cloud services
+- Local OCR + Translation without cloud services
 - Share OCR services across devices in the same network
 - Build an OCR processing cluster using multiple iPhones
