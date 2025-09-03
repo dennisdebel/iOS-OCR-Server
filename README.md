@@ -106,7 +106,8 @@ Includes translation (currently hardcoded Traditional Mandarin Chinese to Englis
   "message": "File uploaded successfully",
   "success": true
   }
-```
+  ```
+
 
 `ocr_result` shows raw ocr results
 `ocr_boxes` contains:
@@ -116,6 +117,7 @@ Includes translation (currently hardcoded Traditional Mandarin Chinese to Englis
 `translated_text` translated text
 `image_width` and `image_height` represent the width and height of the image (in px),
 `ocr_translated_zhHant` full text translation
+
 
 
 - **Python Example – Drawing text bounding boxes using `ocr_boxes` information:**
