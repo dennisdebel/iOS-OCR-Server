@@ -105,8 +105,9 @@ Includes translation (currently hardcoded Traditional Mandarin Chinese to Englis
   ],
   "message": "File uploaded successfully",
   "success": true
-}
-  ```
+  }
+```
+
   `ocr_result` shows raw ocr results
   `ocr_boxes` contains:
     `x` and `y` represent the top-left origin of the text bounding box (in px),
