@@ -2,6 +2,7 @@
 
 Turn your iPhone into a powerful local OCR server using Apple's Vision Framework. 
 No cloud dependencies, unlimited usage, complete privacy.
+Includes translation (currently hardcoded Traditional Mandarin Chinese to English).
 
 [Download from the App Store](https://apps.apple.com/us/app/ocr-server/id6749533041)
 
@@ -50,33 +51,71 @@ No cloud dependencies, unlimited usage, complete privacy.
 
   ```json
   {
-    "success": true,
-    "message": "File uploaded successfully",
-    "ocr_result": "Hello\nWorld",
-    "image_width": 1247,
-    "image_height": 648,
-    "ocr_boxes": [
-      {
-        "text": "Hello",
-        "x": 434.7201472051599,
-        "y": 269.3123034733379,
-        "w": 216.30970547749456,
-        "h": 69.04344177246088
-      },
-      {
-        "text": "World",
-        "x": 429.5100030105896,
-        "y": 420.4043957924413,
-        "w": 242.85499225518635,
-        "h": 73.382080078125
-      }
-    ]
-  }
+  "ocr_result": "19B2\nSolar\nSystem\nCygnus X-1\n飞碟探索",
+  "ocr_boxes": [
+    {
+      "translated_text": "19B2",
+      "h": 482.6347053050994,
+      "y": 13.577584748455148,
+      "text": "19B2",
+      "w": 446.3641785738761,
+      "x": -9.292196731151611
+    },
+    {
+      "translated_text": "Solar",
+      "h": 56.24999999999977,
+      "y": 1342.968749765625,
+      "text": "Solar",
+      "w": 168.42105263157896,
+      "x": 771.9298259649122
+    },
+    {
+      "x": 807.0175456842103,
+      "h": 56.25000000000023,
+      "text": "System",
+      "translated_text": "System",
+      "y": 1392.18749971875,
+      "w": 182.45614035087738
+    },
+    {
+      "x": 1683.4274593113935,
+      "h": 64.25111666321754,
+      "text": "Cygnus X-1",
+      "translated_text": "Cygnus X-1",
+      "y": 2611.6244414173184,
+      "w": 268.2328073601975
+    },
+    {
+      "x": 336.84210442495146,
+      "h": 414.84374999999955,
+      "text": "飞碟探索",
+      "translated_text": "Flying saucer exploration",
+      "y": 2700.000001152344,
+      "w": 1775.4385964912283
+    }
+  ],
+  "image_width": 2400,
+  "image_height": 3375,
+  "ocr_translated_zhHant": [
+    "19B2",
+    "Solar",
+    "System",
+    "Cygnus X-1",
+    "Flying saucer exploration"
+  ],
+  "message": "File uploaded successfully",
+  "success": true
+}
   ```
-  
+  `ocr_result` shows raw ocr results
+  `ocr_boxes` contains:
+    `x` and `y` represent the top-left origin of the text bounding box (in px),
+    `w` and `h` represent the width and height of the text bounding box (in px).
+    `text` original text
+    `translated_text` translated text
   `image_width` and `image_height` represent the width and height of the image (in px),
-  `x` and `y` represent the top-left origin of the text bounding box (in px),
-  `w` and `h` represent the width and height of the text bounding box (in px).
+  `ocr_translated_zhHant` full text translation
+
 
 - **Python Example – Drawing text bounding boxes using `ocr_boxes` information:**
 
@@ -211,6 +250,19 @@ No cloud dependencies, unlimited usage, complete privacy.
   Sample Output:
 
   ![image3](image3.png)
+
+
+- **Advanced Python Example – Drawing text bounding boxes using `ocr_boxes` information and output ocr'ed pdf:**
+Install `pip3 install requests pillow opencv-python pymupdf`
+Run `python3 ocr-server-example.py`
+
+  Sample input:
+
+  ![input1](input.jpg)
+
+  Sample Output:
+
+  ![output1](output.jpg)
 
 
 ## Features

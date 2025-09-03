@@ -87,12 +87,12 @@ struct ContentView: View {
         .background(Color.black)
         .overlay(
                     // Invisible bridge that initializes TranslationSession once:
-                    TranslationBridge(
-                        source: nil, // let system infer per fragment
-                        target: .init(identifier: "zh-Hant")
-                    ) { session in
-                        serverManager.setTranslationSession(session)
-                    }
+            TranslationBridge(
+                source: .init(identifier: "zh-Hant"),
+                target: .init(identifier: "en")
+            ) { session in
+                serverManager.setTranslationSession(session)
+            }
                     .frame(width: 0, height: 0)
         )
         .overlay(

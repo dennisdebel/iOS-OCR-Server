@@ -11,10 +11,15 @@ import Translation
 
 struct OCRBoxItem: Content {
     let text: String
+    var translatedText: String?
     let x: Double
     let y: Double
     let w: Double
     let h: Double
+    enum CodingKeys: String, CodingKey {
+            case x, y, w, h, text
+            case translatedText = "translated_text" // snake_case in JSON
+        }
 }
 
 struct OCRResult: Content {
@@ -35,6 +40,9 @@ struct UploadResponse: Content {
     let target_lang: String?
 }
 
+extension Array {
+    subscript(safe i: Index) -> Element? { indices.contains(i) ? self[i] : nil }
+}
 
 actor VaporServer {
     private var translationSession: TranslationSession?
@@ -147,6 +155,7 @@ actor VaporServer {
         isRunning = false
     }
 
+    
     // MARK: - Routes
 
     private func routes(_ app: Application) throws {
@@ -282,16 +291,44 @@ actor VaporServer {
      
             // --- NEW: attempt translation if a session exists ---
             var translated: [String]? = nil
+            // Attach per-box translated_text AND keep a flat list for backward compatibility
+            var boxes = result.boxes // make a mutable copy
+            var flatTranslated: [String]? = nil
+            var targetLangId: String? = nil
+
             if let session = await self.translationSession {
                 do {
-                    let manager = TranslationManager()          // ← declare it here
-                    manager.attach(session: session)            // or manager.attach(session) if your signature is unlabeled
-                    let lines = result.boxes.map(\.text)        // or: result.boxes.map { $0.text } for older Swift
-                    translated = try await manager.translateBatch(lines)
+                    let targetLangId = (translated == nil) ? nil : "zh-Hant"
+
+                    let manager = TranslationManager()
+                    manager.attach(session: session)
+
+                    // Translate only non-empty texts, remember their indices
+                    let toTranslate: [(idx: Int, text: String)] = boxes.enumerated().compactMap { i, b in
+                        let t = b.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                        return t.isEmpty ? nil : (i, t)
+                    }
+
+                    if !toTranslate.isEmpty {
+                        let translatedBatch = try await manager.translateBatch(toTranslate.map(\.text))
+
+                        // Map back to the original boxes by index
+                        for (j, idx) in toTranslate.map(\.idx).enumerated() {
+                            if let t = translatedBatch[safe: j] {
+                                boxes[idx].translatedText = t
+                            }
+                        }
+
+                        // Build flat array aligned to boxes (empty string if no translation/empty original)
+                        flatTranslated = boxes.map { $0.translatedText ?? "" }
+                    }
                 } catch {
-                    translated = nil // keep going even if translation fails
+                    // If translation fails, leave translated fields nil
+                    flatTranslated = nil
+                    targetLangId = nil
                 }
             }
+
 
             
             let accept = (req.headers.first(name: .accept) ?? "").lowercased()
@@ -304,10 +341,10 @@ actor VaporServer {
                         ocr_result: result.text,
                         image_width: result.image_width,
                         image_height: result.image_height,
-                        ocr_boxes: result.boxes,
-                        ocr_translated_zhHant: translated,
-                        target_lang: translated == nil ? nil : "zh-Hant"
-                    )
+                        ocr_boxes: boxes,                          // ← mutated boxes with translated_text
+                        ocr_translated_zhHant: flatTranslated,     // ← optional flat list (back-compat)
+                        target_lang: targetLangId                  // ← e.g., "zh-Hant" if session is set
+                        )
                 )
                 
             } else {
